@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Geolocation;
 use App\Models\Pemancangan;
 use Illuminate\Http\Request;
+use App\Helpers;
+use App\Helpers\App;
 
 class PemancanganController extends Controller
 {
@@ -68,25 +70,50 @@ class PemancanganController extends Controller
             'lng' => 'required',
             'image' => 'mimes:jpeg,bmp,png'
         ]);
-        $model = new Geolocation();
-        $model->no_registrasi = $request->no_registrasi;
-        $model->lat = $request->lat;
-        $model->lng = $request->lng;
-        $model->status = $request->status;
-        if($model->save()){
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil Disimpan',
 
-            ],201);
-        }else{
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal Disimpan',
+        if ($request->hasFile('image')) {
+            $original_filename = $request->file('image')->getClientOriginalName();
+            $original_filename_arr = explode('.', $original_filename);
+            $file_ext = end($original_filename_arr);
+            $destination_path = App::public_path('uploads/images');
+            $image = 'U-' . time() . '.' . $file_ext;
 
-            ],401);
+            if ($request->file('image')->move($destination_path, $image)) {
+                $model = new Geolocation();
+                $model->no_registrasi = $request->no_registrasi;
+                $model->lat = $request->lat;
+                $model->lng = $request->lng;
+                $model->images = '/uploads/images' . $image;
+                $model->status = 1;
+                if($model->save()){
+                    return $this->responseRequestSuccess($destination_path);
+                }else{
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal Disimpan',
+
+                    ],401);
+                }
+            } else {
+                return $this->responseRequestError('Cannot upload file');
+            }
+        } else {
+            return $this->responseRequestError('File not found');
         }
         
+    }
+    protected function responseRequestSuccess($ret = null)
+    {
+        return response()->json(['success' => true, 'data' => $ret], 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    }
+
+    protected function responseRequestError($message = 'Bad request', $statusCode = 200)
+    {
+        return response()->json(['status' => 'error', 'error' => $message], $statusCode)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
     
 }
