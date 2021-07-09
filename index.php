@@ -10,7 +10,7 @@
 |
 */
 
-$app = require __DIR__.'/build/bootstrap/app.php';
+$app = require __DIR__.'/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
