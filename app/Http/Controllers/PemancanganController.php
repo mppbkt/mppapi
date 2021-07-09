@@ -28,10 +28,7 @@ class PemancanganController extends Controller
                 ->orWhere('jenis_permohonan','')
                 ->orWhere('jenis_permohonan',null)
                 ->get();
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ],200);
+            return response()->json($data);
         } catch (\Throwable $e) {
             return response()->json([
                 'error' => $e->errorInfo[2],

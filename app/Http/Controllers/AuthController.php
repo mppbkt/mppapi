@@ -53,7 +53,8 @@ class AuthController extends Controller
     public function login(Request $request){
         $user = User::where('name', $request->input('username'))->first();
         if(Hash::check($request->input('password'), $user->password)){
-            $apiToken = base64_encode(Str::random(40));
+            // $apiToken = base64_encode(Str::random(40));
+           $apiToken = 'V0V4amJwck9OZ1JuOUtmR1R4QUU1dlpzeWlGaENLSnZxWnR4dlBVag==';
             // dd($apiToken);
             $user->update([
                 'remember_token' => $apiToken
