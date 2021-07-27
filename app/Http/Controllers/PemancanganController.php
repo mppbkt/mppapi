@@ -15,18 +15,16 @@ class PemancanganController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
 
     public function all_data(){
         try {
             $data = Pemancangan::leftJoin('proses_izin as a','a.no_registrasi','=', 'rekap_data.no_registrasi')
                 ->where('a.kode_proses', 2)
                 ->where('jenis_permohonan','like','%IMB%')
-                ->orWhere('jenis_permohonan','')
-                ->orWhere('jenis_permohonan',null)
                 ->get();
             return response()->json($data);
         } catch (\Throwable $e) {
@@ -65,8 +63,25 @@ class PemancanganController extends Controller
             'no_registrasi' => 'required',
             'lat' => 'required',
             'lng' => 'required',
-            'image' => 'mimes:jpeg,bmp,png'
         ]);
+
+                $model = new Geolocation();
+                $model->no_registrasi = $request->no_registrasi;
+                $model->lat = $request->lat;
+                $model->lng = $request->lng;
+                $model->status = 1;
+                if($model->save()){
+                    return $this->responseRequestSuccess();
+                }else{
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal Disimpan',
+
+                    ],401);
+                }
+    }
+
+    public function simpan_koordinat_update(Request $request){
 
         if ($request->hasFile('image')) {
             $original_filename = $request->file('image')->getClientOriginalName();
@@ -76,13 +91,9 @@ class PemancanganController extends Controller
             $image = 'U-' . time() . '.' . $file_ext;
 
             if ($request->file('image')->move($destination_path, $image)) {
-                $model = new Geolocation();
-                $model->no_registrasi = $request->no_registrasi;
-                $model->lat = $request->lat;
-                $model->lng = $request->lng;
-                $model->images = '/uploads/images' . $image;
-                $model->status = 1;
-                if($model->save()){
+                $model = Geolocation::where('no_registrasi', $request->no_registrasi)->first();
+                $model->images = '/uploads/images/' . $image;
+                if($model->update()){
                     return $this->responseRequestSuccess($destination_path);
                 }else{
                     return response()->json([
@@ -99,6 +110,7 @@ class PemancanganController extends Controller
         }
         
     }
+
     protected function responseRequestSuccess($ret = null)
     {
         return response()->json(['success' => true, 'data' => $ret], 200)

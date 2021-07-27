@@ -31,3 +31,4 @@ $router->post('/login', 'AuthController@login');
 $router->get('/all-pemancangan', 'PemancanganController@all_data');
 $router->post('/get-detail', 'PemancanganController@getdetail');
 $router->post('/simpan-koordinat', 'PemancanganController@simpan_koordinat');
+$router->post('/simpan-koordinat/update', 'PemancanganController@simpan_koordinat_update');
