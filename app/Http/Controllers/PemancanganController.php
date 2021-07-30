@@ -124,5 +124,17 @@ class PemancanganController extends Controller
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
+
+    public function data_terakhir(){
+        try {
+            $data = Geolocation::orderBy('created_at','DESC')->take(4)->get();
+            return response()->json($data);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => $e->errorInfo[2],
+                'success' => false
+            ]);
+        } 
+    }
     
 }

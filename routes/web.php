@@ -32,3 +32,4 @@ $router->get('/all-pemancangan', 'PemancanganController@all_data');
 $router->post('/get-detail', 'PemancanganController@getdetail');
 $router->post('/simpan-koordinat', 'PemancanganController@simpan_koordinat');
 $router->post('/simpan-koordinat/update', 'PemancanganController@simpan_koordinat_update');
+$router->get('/data/terakhir', 'PemancanganController@data_terakhir');
